@@ -5,8 +5,6 @@ import {PokemonMapper} from '../../infraestructure/mappers/pokemon.mapper';
 
 export const getPokemonById = async (id: number): Promise<Pokemon> => {
   try {
-    console.log(`petición http ${id}`);
-
     const {data} = await pokeApi.get<PokeAPIPokemon>(`/pokemon/${id}`);
 
     const pokemon = await PokemonMapper.pokeApiPokemonToEntity(data);

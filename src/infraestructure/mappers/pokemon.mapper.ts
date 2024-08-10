@@ -5,6 +5,7 @@ import {PokeAPIPokemon} from '../interfaces/pokeapi.interfaces';
 export class PokemonMapper {
   static async pokeApiPokemonToEntity(data: PokeAPIPokemon): Promise<Pokemon> {
     const sprites = PokemonMapper.getSprites(data);
+    const games = PokemonMapper.getGames(data);
     const avatar = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${data.id}.png`;
 
     const color = await getColorFromImage(avatar);
@@ -16,7 +17,22 @@ export class PokemonMapper {
       types: data.types.map(type => type.type.name),
       sprites: sprites,
       color: color,
+      games: data.game_indices.map(game => game.version.name),
+      stats: data.stats.map(stat => ({
+        name: stat.stat.name,
+        value: stat.base_stat,
+      })),
+      abilities: data.abilities.map(ability => ability.ability.name),
+      moves: data.moves
+        .map(move => ({name: move.move.name, level: move.version_group_details[0].level_learned_at}))
+        .sort((a, b) => a.level - b.level),
     };
+  }
+
+  static getGames(data: PokeAPIPokemon): string[] {
+    const games = data.game_indices.map(game => game.version.name);
+
+    return games;
   }
 
   static getSprites(data: PokeAPIPokemon): string[] {
